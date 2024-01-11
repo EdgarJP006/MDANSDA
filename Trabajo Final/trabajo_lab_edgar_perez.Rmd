@@ -1,0 +1,22 @@
+---
+title: 'Reglas de asociación: Trabajo en laboratorio'
+author: "Edgar Pérez"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+library(dplyr)
+library(arules)
+```
+Caargamos el conjunto de datos para el estudio
+```{r}
+BooksR <- read.csv("book/BX-Book-Ratings.csv", sep = ";")
+dim(BooksR)
+BooksR
+```
+
