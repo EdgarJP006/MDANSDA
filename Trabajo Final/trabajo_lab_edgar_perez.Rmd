@@ -12,11 +12,112 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(dplyr)
 library(arules)
+library(tidyverse)
 ```
-Caargamos el conjunto de datos para el estudio
+Para este proyecto utilizaremos el conjunto de datos de Charles Book Club, que consiste en un conjunto de datos de ventas de libros llamado del mismo nombre CharlesBookClub que contiene un total de 4000 datos de compras de libros por sus usuarios, los datos de los libros se describen a continuación:
+
+https://github.com/kwartler/Harvard_DataMining_Business_Student/blob/master/BookDataSets/CharlesBookClub.csv
+
+Seq#: Número de secuencia de los datos
+
+ID#: Número de identificación en el conjunto de datos de prueba de mercado completo (no particionado)
+
+Sexo: O=Hombre 1=Mujer
+
+M: Monetario - Total de dinero gastado en libros
+
+R: Recencia - Meses transcurridos desde la última compra
+
+F: Frecuencia - Número total de compras
+
+FirstPurch: Meses desde la primera compra
+
+ChildBks: compras de Libros infantiles
+
+YouthBks: compras de Libros juveniles
+
+CookBks: compras de Libros de cocina
+
+DoItYBks: Libros de bricolaje
+
+RefBks: Libros de referencia (atlas, enciclopedias, diccionarios)
+
+ArtBks: Libros de arte
+
+GeoBks: Libros de geografía
+
+ItalCook: "Secretos de la cocina italiana"
+
+ItalAtlas: "Atlas histórico de Italia"
+
+ItalArt: "Arte italiano"
+
+Florence: 1 si se compró "Historia del arte de Florencia", = 0 en caso contrario
+
+Related Purchase: Número de libros relacionados comprados 
+
+Cargamos el conjunto de datos para el estudio
 ```{r}
-BooksR <- read.csv("book/BX-Book-Ratings.csv", sep = ";")
-dim(BooksR)
-BooksR
+book <- read.csv("c:/Users/PJ_00/OneDrive - Universidad de Panamá/Documentos/DATCOM2023/Minería de datos aprendizaje no supervisado y detección de anomalías/Trabajo Final/book/CharlesBookClub.csv")
+str(book)
 ```
+```{r}
+head(book)
+```
+
+Peocederemos a eliminar las columnas que no utilizaremos en el analisis de nuestro conjunto de datos
+```{r}
+
+book <- book %>%
+    select(-c(Seq., ID., Gender, M, R, F, FirstPurch, Florence, Related.Purchase, Yes_Florence, No_Florence, Mcode, Rcode, Fcode))
+str(book)
+```
+Los artículos con una compra de 1 o más se modifican a 1.
+
+```{r}	
+book <- book %>%
+    mutate(across(c(ChildBks:ItalArt), as.factor))
+str(book)
+```
+```{r}
+# Creating rules by apriori algo. :
+rules_books<-apriori(book)
+```
+```{r}
+inspect(head(rules_books),n=10)
+rules_sorted<-inspect(head(sort(rules_books,by="lift"),n=10))
+```
+```{r}
+#Reduce the no of rules by changing support and confidence value:
+
+rules_book<-apriori(book,parameter = list(support=0.2,confidence=0.5,minlen=5))
+```
+```{r}
+#Set of rules : 9407
+#Confidence=0.5 and support=0.2
+
+rules_sorted1<-inspect(head(sort(rules_book,by="lift"),n=10))
+
+quality(head(sort(rules_book,by="lift")))
+```
+```{r}
+#Visualization of Rules created:
+#Need to install package arulesViz
+#install.packages("arulesViz")
+library(arulesViz)
+
+#Scatter Plot
+plot(sort(rules_book,by="lift"))
+plot(sort(rules_books,by="lift"))
+
+#Graph Plot:
+plot(sort(rules_book,by="lift"),method="graph")
+plot(sort(rules_books,by="lift"),method="graph")
+
+#Grouped Matix for top 10 rules :
+
+plot(head(sort(rules_book,by="lift"),n=100),method = "grouped")
+plot(head(sort(rules_books,by="lift"),n=100),method = "grouped")
+```
+
 

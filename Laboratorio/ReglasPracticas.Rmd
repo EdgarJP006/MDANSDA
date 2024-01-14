@@ -1,6 +1,5 @@
 ---
 title: "Guión de prácticas para Reglas de Asociación"
-author: "Lidia Sánchez Mérida"
 output: pdf_document
 ---
 
